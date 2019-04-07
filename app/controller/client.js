@@ -50,6 +50,8 @@ class ClientController extends Controller {
    * @apiParam  {String} sign 客户端推送过来的签名 加密方式为 md5(md5(price + type) + secretkey) // 收款金额，收款方式(wechat/alipay)，密匙
    * @apiParam  {String} type 客户端推送过来的收款方式 wechat/alipay （微信/支付宝）
    * @apiParam  {String} price 客户端推送过来的真实收款金额
+   * @apiParam  {String} clientId 客户端id
+   * @apiParam  {datetime} datetime 客户端推送过来的真实收款金额 YYYY-MM-DD HH:MM:SS
    *
    * @apiSuccess (200) {type} name description
    *
@@ -59,12 +61,12 @@ class ClientController extends Controller {
     try {
       // 处理客户端推送过来的信息
       const { ctx, config: { secretkey } } = this;
-      const { sign, price, type } = ctx.query;
+      const { sign, price, type, datetime } = ctx.query;
       const price_float = Math.abs(parseFloat(price));
       // 处理过期订单
       await ctx.service.order.update();
       // 验证信息
-      if (sign !== md5(md5(price + type) + secretkey)) throw '处理订单失败，客户端密匙有误!';
+      if (sign !== md5(md5(price + type + datetime) + secretkey)) throw '处理订单失败，客户端密匙有误!';
       // 处理订单逻辑 TODO //
       const result = await ctx.service.order.save_order(price, type);
       if (!result) {

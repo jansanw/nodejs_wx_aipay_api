@@ -17,11 +17,14 @@ class BaiduService extends Service {
           if (element.words.includes('微信')) {
             qrData.qr_type = 'wechat';
           }
+          if (element.words.includes('支付宝')) {
+            qrData.qr_type = 'alipay';
+          }
           if (element.words.includes('￥')) {
             qrData.qr_price = element.words.substring(1);
           }
         });
-        if (qrData.qr_type !== 'wechat' && qrData.qr_price !== undefined) {
+        if (qrData.qr_type === undefined || qrData.qr_price === undefined) {
           resolve();
         }
         resolve(qrData);
